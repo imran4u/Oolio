@@ -12,6 +12,13 @@ func APIKeyAuth() gin.HandlerFunc {
 
 		key := c.GetHeader("api_key")
 
+		if key == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"message": "missing api key",
+			})
+			return
+		}
+
 		if key != "apitest" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "invalid api key",

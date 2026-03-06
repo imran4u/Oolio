@@ -12,6 +12,7 @@ func RegisterRoutes(r *gin.Engine, couponSvc interface {
 }) {
 
 	api := r.Group("/api")
+	api.Use(middleware.APIKeyAuth())
 
 	api.GET("/product", handler.ListProducts)
 	api.GET("/product/:productId", handler.GetProduct)
@@ -19,7 +20,6 @@ func RegisterRoutes(r *gin.Engine, couponSvc interface {
 	orderHandler := handler.NewOrderHandler(couponSvc)
 
 	api.POST("/order",
-		middleware.APIKeyAuth(),
 		orderHandler.PlaceOrder,
 	)
 }

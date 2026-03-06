@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"unicode"
 
 	"github.com/imran4u/Oolio/internal/repository"
 
@@ -18,6 +19,15 @@ func ListProducts(c *gin.Context) {
 func GetProduct(c *gin.Context) {
 
 	id := c.Param("productId")
+
+	for _, r := range id {
+		if !unicode.IsDigit(r) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid product id",
+			})
+			return
+		}
+	}
 
 	product, found := repository.GetProductByID(id)
 
