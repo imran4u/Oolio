@@ -20,17 +20,36 @@ func (c *CouponService) ValidateCoupon(code string) bool {
 		return false
 	}
 
-	count := 0
+	results := make(chan bool)
+	done := make(chan struct{})
 
 	for _, file := range c.files {
 
-		found := searchInFile(file, code)
+		go func(f string) {
 
-		if found {
+			select {
+			case <-done:
+				return
+			default:
+			}
+
+			found := searchInFile(f, code)
+
+			results <- found
+
+		}(file)
+	}
+
+	count := 0
+
+	for i := 0; i < len(c.files); i++ {
+
+		if <-results {
 			count++
 		}
 
 		if count >= 2 {
+			close(done)
 			return true
 		}
 	}
